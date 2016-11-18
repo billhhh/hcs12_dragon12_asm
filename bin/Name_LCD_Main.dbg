@@ -1,15 +1,15 @@
-;Main
-       
-    
-; Include derivative-specific definitions 
-		  INCLUDE 'mc9s12dp256.inc'     ;CPU used by Dragon12+ board
-; Based on CPU DB MC9S12DP256_112, version 2.87.441 (RegistersPrg V2.28)
+; export symbols
+
+            XREF HERE
+            ABSENTRY Entry        ; for absolute assembly: mark this as application entry point
+	        	INCLUDE 'mc9s12dp512.inc' 
+; Based on CPU DB MC9S12DP512_112, version 2.87.359 (RegistersPrg V2.28)
 
 ; ###################################################################
-;     Filename  : mc9s12dp256.inc
-;     Processor : MC9S12DP256BCPV
+;     Filename  : mc9s12dp512.inc
+;     Processor : MC9S12DP512BCPV
 ;     FileFormat: V2.28
-;     DataSheet : manual revision not specified
+;     DataSheet : 9S12DP512DGV1/D V01.16
 ;     Compiler  : CodeWarrior compiler
 ;     Date/Time : 2.7.2009, 8:37
 ;     Abstract  :
@@ -21,7 +21,7 @@
 ;     mail      : support@freescale.com
 ;
 ;     CPU Registers Revisions:
-;      - 24.05.2006, V2.87.368:
+;      - 24.05.2006, V2.87.300:
 ;              - Removed bits MCCNTlo_BIT0..MCCNTlo_BIT7 and MCCNThi_BIT8.. MCCNThi_BIT15. REASON: Bug-fix (#3166 in Issue Manager)
 ;
 ;     File-Format-Revisions:
@@ -94,13 +94,45 @@
 ;*** Memory Map and Interrupt Vectors
 ;******************************************
 EEPROMStart:        equ   $00000400
-EEPROMEnd:          equ   $00000FEF
-RAMStart:           equ   $00001000
+EEPROMEnd:          equ   $000007FF
+RAMStart:           equ   $00000800
 RAMEnd:             equ   $00003FFF
 ROM_4000Start:      equ   $00004000
 ROM_4000End:        equ   $00007FFF
 ROM_C000Start:      equ   $0000C000
 ROM_C000End:        equ   $0000FEFF
+PAGE_20Start:       equ   $00208000
+PAGE_20End:         equ   $0020BFFF
+PAGE_21Start:       equ   $00218000
+PAGE_21End:         equ   $0021BFFF
+PAGE_22Start:       equ   $00228000
+PAGE_22End:         equ   $0022BFFF
+PAGE_23Start:       equ   $00238000
+PAGE_23End:         equ   $0023BFFF
+PAGE_24Start:       equ   $00248000
+PAGE_24End:         equ   $0024BFFF
+PAGE_25Start:       equ   $00258000
+PAGE_25End:         equ   $0025BFFF
+PAGE_26Start:       equ   $00268000
+PAGE_26End:         equ   $0026BFFF
+PAGE_27Start:       equ   $00278000
+PAGE_27End:         equ   $0027BFFF
+PAGE_28Start:       equ   $00288000
+PAGE_28End:         equ   $0028BFFF
+PAGE_29Start:       equ   $00298000
+PAGE_29End:         equ   $0029BFFF
+PAGE_2AStart:       equ   $002A8000
+PAGE_2AEnd:         equ   $002ABFFF
+PAGE_2BStart:       equ   $002B8000
+PAGE_2BEnd:         equ   $002BBFFF
+PAGE_2CStart:       equ   $002C8000
+PAGE_2CEnd:         equ   $002CBFFF
+PAGE_2DStart:       equ   $002D8000
+PAGE_2DEnd:         equ   $002DBFFF
+PAGE_2EStart:       equ   $002E8000
+PAGE_2EEnd:         equ   $002EBFFF
+PAGE_2FStart:       equ   $002F8000
+PAGE_2FEnd:         equ   $002FBFFF
 PAGE_30Start:       equ   $00308000
 PAGE_30End:         equ   $0030BFFF
 PAGE_31Start:       equ   $00318000
@@ -12806,117 +12838,22 @@ mNVFSEC_KEYEN:      equ    %10000000
 ; ---------------------------------------------------------------------------
 
 ; EOF
-		  		  
-		  XREF DELAY
- 
-	
-LCD_DATA	EQU PORTK		
-LCD_CTRL	EQU PORTK		
-RS	EQU mPORTK_BIT0	
-EN	EQU mPORTK_BIT1	
 
-;----------------------USE $1000-$2FFF for Scratch Pad 
+ROMStart    EQU  $8000  ; absolute address to place my code/constant data
 
-TEMP    EQU     $1200
 
-;code section
-      ORG   $4000     ;Flash ROM address for Dragon12+
+; code section
+            ORG   ROMStart
+
+
 Entry:
-	    LDS   #$4000    ;Stack
-      
-  		LDAA  #$FF
-		  STAA  DDRK		
-		  LDAA  #$33
-		  JSR	  COMWRT4    	
-  		JSR   DELAY
-  		LDAA  #$32
-		  JSR	  COMWRT4		
- 		  JSR   DELAY
-		  LDAA	#$28	
-		  JSR	  COMWRT4    	
-		  JSR	  DELAY   		
-		  LDAA	#$0E     	
-		  JSR	  COMWRT4		
-		  JSR   DELAY
-		  LDAA	#$01     	
-		  JSR	  COMWRT4    	
-		  JSR   DELAY
-		  LDAA	#$06     	
-		  JSR	  COMWRT4    	
-		  JSR   DELAY
-		  LDAA	#$80     	
-		  JSR	  COMWRT4    	
-		  JSR   DELAY
-		  LDAA	#'Y'     	
-		  JSR	  DATWRT4    	
-		  JSR   DELAY
-		  LDAA  #'E'     	
-		  JSR	  DATWRT4 
-		  JSR   DELAY
-		  LDAA  #'S'     	
-		  JSR	  DATWRT4 
-		  JSR   DELAY
-		   	
-AGAIN: BRA	AGAIN      	
-;----------------------------
-COMWRT4:               		
-		  STAA	TEMP		
-		  ANDA  #$F0
-		  LSRA
-		  LSRA
-		  STAA  LCD_DATA
-		  BCLR  LCD_CTRL,RS 	
-		  BSET  LCD_CTRL,EN 	
-		  NOP
-		  NOP
-		  NOP				
-		  BCLR  LCD_CTRL,EN 	
-		  LDAA  TEMP
-		  ANDA  #$0F
-    	LSLA
-    	LSLA
-  		STAA  LCD_DATA
-		  BCLR  LCD_CTRL,RS 	
-		  BSET  LCD_CTRL,EN 	
-		  NOP
-		  NOP
-		  NOP				
-		  BCLR  LCD_CTRL,EN 	
-		  RTS
-;--------------		  
-DATWRT4:                   	
-		  STAA	 TEMP		
-		  ANDA   #$F0
-		  LSRA
-		  LSRA
-		  STAA   LCD_DATA
-		  BSET   LCD_CTRL,RS 	
-		  BSET   LCD_CTRL,EN 	
-		  NOP
-		  NOP
-		  NOP				
-		  BCLR   LCD_CTRL,EN 	
-		  LDAA   TEMP
-		  ANDA   #$0F
-    	LSLA
-      LSLA
-  		STAA   LCD_DATA
-  		BSET   LCD_CTRL,RS
-		  BSET   LCD_CTRL,EN 	
-		  NOP
-		  NOP
-		  NOP				
-		  BCLR   LCD_CTRL,EN 	
-		  RTS
-;-------------------		  
 
+SUM EQU $210  ;RAM loc 210H for SUM
+    LDAA #$25 ;A = 25H
+    ADDA #$34 ;add 34H to A (A=59H)
+    ADDA #$11 ;add 11H to A (A=6AH) 
+    ADDA #18  ;A = A + 12H = 7CH
+    ADDA #%00011100 ;A = A + 1CH = 98H
+    STAA SUM        ;save the SUM in loc 210H
+    JMP HERE       ;infinity loop
 
-
-
-
-            
-;**************************************************************
-;*                 Interrupt Vectors                          *
-;**************************************************************
-      ORG   $FFFE
-      DC.W  Entry     ;Reset Vector. CPU wakes here and it is sent to start of the code at $4000
