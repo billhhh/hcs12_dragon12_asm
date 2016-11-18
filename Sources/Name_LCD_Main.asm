@@ -1,6 +1,4 @@
 ;Main
-
-        ABSENTRY Entry        ; for absolute assembly: mark this as application entry point
     
 ; Include derivative-specific definitions 
 		  INCLUDE 'mc9s12dp256.inc'     ;CPU used by Dragon12+ board

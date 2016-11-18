@@ -1,11 +1,11 @@
-        XDEF DELAY
+        INCLUDE 'mc9s12dp256.inc'
+        
 R1      EQU     $1001
 R2      EQU     $1002
 R3      EQU     $1003
 
-;ORG   $4500
-DELAY:
-
+        XDEF DELAY
+DELAY   ORG   $4500
         PSHA		;Save Reg A on Stack
         LDAA    #1		  
         STAA    R3		
